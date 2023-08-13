@@ -1,0 +1,30 @@
+---
+- name: "Converge"
+  hosts: "all"
+  become: true
+
+  vars:
+    "pip_install_packages":
+      # Workaround for https://github.com/docker/docker-py/issues/3113
+      - name: "docker"
+        version: ">=2.4.2,<5.0.0"
+      - name: "requests"
+        version: "<2.29.0"
+      - name: "urllib3"
+        version: "<2"      
+
+  pre_tasks:
+    - name: "Update apt cache"
+      ansible.builtin.apt:
+        cache_valid_time: 600
+        update_cache: "yes"
+      when: "ansible_os_family == 'Debian'"
+    
+  roles:
+    - role: "geerlingguy.pip"
+    - role: "geerlingguy.docker"
+    - role: "organicveggie.home_assistant_docker"
+      vars:
+        "hass_docker_memory": "1GB"
+        "hass_docker_cpus": "1"
+        "hass_docker_network_create": "true"

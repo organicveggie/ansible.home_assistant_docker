@@ -1,0 +1,24 @@
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+{% if hass_docker_recorder_db_url %}
+recorder:
+  db_url: !secret recorder_db_url
+{% endif %}
+
+homeassistant:
+  name: "{{ hass_docker_home_name }}"
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  unit_system: "{{ hass_docker_home_units }}"
+  time_zone: !secret home_time_zone
+  allowlist_external_dirs:
+    - "/config"
+  internal_url: "{{ hass_docker_url }}"
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - "127.0.0.1"
+    - "{{ hass_docker_network_subnet }}"
+    - "::1"

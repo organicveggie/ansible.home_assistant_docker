@@ -1,0 +1,140 @@
+---
+#####
+# Home Assistant settings
+#####
+
+# Latitude of the location where Home Assistant is running.
+hass_docker_home_latitude: "38.8977"
+
+# Longitude of the location where Home Assistant is running.
+hass_docker_home_longitude: "77.0365"
+
+# Name of the location where Home Assistant is running.
+hass_docker_home_name: "home"
+
+# Timeone of the location where Home Assistant is running.
+hass_docker_home_timezone: "America/New_York"
+
+# Default system of units in the location where Home Assistant is running.
+hass_docker_home_units: "imperial"
+
+# URL of the Home Assistant instance.
+hass_docker_url: "https://{{ hass_docker_host_name }}.{{ hass_docker_host_domain }}"
+
+#####
+# Home Assistant integrations
+#####
+
+# Port number to use when listening for Ecowitt connections.
+hass_docker_ecowitt_port: null
+
+#####
+# Container settings
+#####
+
+# Name of the Docker container.
+hass_docker_name: "hass"
+
+# Base name of the Docker image to use for the container.
+hass_docker_image_name: "homeassistant/home-assistant"
+
+# Specific Docker image version to use for the container.
+hass_docker_image_version: "stable"
+
+# Number of vCPUs to allocate to the container.
+hass_docker_cpus: "2"
+
+# Amount of memory to allocate to the container.
+hass_docker_memory: "2GB"
+
+# TCP port number to expose to handle HTTP traffic.
+hass_docker_web_port: "8123"
+
+#####
+# Docker volumes and folders.
+#####
+
+# Create and use Docker volumes for storing data. True creates volumes and attaches them to the
+# container. False creates folders and bind mounts them to the container.
+hass_docker_use_volumes: true
+
+# Name of the Docker volume to create to store config files. Only used when
+# [hass_docker_use_volumes] is true.
+hass_docker_volume_config_name: "hass-config"
+
+# Directory on filesystem to use for storing data files. Only used when
+# [hass_docker_use_volumes] is false.
+hass_docker_data_dir: "/var/lib/home-assistant"
+
+#####
+# Docker networks
+#####
+
+# Name of the default Docker network for the container. The container will *always* attach to this
+# network. If [hass_docker_network_create] is true, this is also the name of the network which
+# will be created.
+hass_docker_network_name: "hass"
+
+# List of additional networks the container should attach to. Elements should be dictionaries like
+# https://docs.ansible.com/ansible/latest/collections/community/docker/docker_container_module.html#parameter-networks.
+hass_docker_extra_networks: []
+
+# List of aliases for this container in the default network. These names can be used in the default
+# network to reach this container.
+hass_docker_network_aliases: []
+
+# The container’s IPv4 address in the default network. Defaults to using DHCP.
+hass_docker_network_ipv4: null
+
+# The container’s IPv6 address in the default network. Defaults to using DHCP. Only applies if
+# IPv6 is enabled in the default network.
+hass_docker_network_ipv6: null
+
+# Create the default Docker network. True creates network and attaches the container to it. False
+# does not create the network.
+hass_docker_network_create: false
+
+# Driver to use for the default Docker network for the container. Only used when
+# [hass_docker_network_create] is enabled. See https://docs.docker.com/network/#network-drivers
+# for available options.
+hass_docker_network_driver: "bridge"
+
+# Enable IPv6 in the default Docker network for the container. Only used when
+# [hass_docker_network_create] is enabled.
+hass_docker_network_enable_ipv6: "false"
+
+# Restrict external access to the default network. See
+# https://docs.docker.com/engine/reference/commandline/network_create/#network-internal-mode.
+# Only used when [hass_docker_network_create] is enabled.
+hass_docker_network_internal: "yes"
+
+# Control the default network's scope. Only used when [hass_docker_network_create] is enabled.
+hass_docker_network_scope: "local"
+
+# IPv4 subnet for the default network. Only used when [hass_docker_network_create] is enabled.
+hass_docker_network_subnet: "172.101.1.0/24"
+
+# IPv4 gateway for the default network. Only used when [hass_docker_network_create] is enabled.
+hass_docker_network_gateway: "172.101.1.1"
+
+#####
+# Database settings
+#####
+
+# Customize the database engine used by the recorder integration.
+hass_docker_recorder_db_url: null
+
+#####
+# Traefik
+#####
+
+# Enable use of Traefik as a proxy.
+hass_docker_available_externally: "true"
+
+# Host name to use for the Traefik endpoint. Combined with [hass_docker_host_domain] to form the
+# FQDN for the endpoint.
+hass_docker_host_name: "hass"
+
+# Domain name to use for the Traefik endpoint. Combined with [hass_docker_host_name] to form the
+# FQDN for the endpoint. Also used by Traefik to create the necessary Let's Encrypt certificate.
+hass_docker_host_domain: "example.com"

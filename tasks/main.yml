@@ -1,0 +1,25 @@
+---
+- name: "Run general setup"
+  ansible.builtin.import_tasks: "setup.yml"
+  tags:
+    - "hass"
+    - "homeassistant"
+    - "hass:setup"
+    - "homeassistant:setup"
+
+- name: "Run network setup"
+  ansible.builtin.import_tasks: "network.yml"
+  tags:
+    - "hass"
+    - "homeassistant"
+    - "hass:network"
+    - "homeassistant:network"
+  when: "hass_docker_network_create"
+
+- name: "Create container"
+  ansible.builtin.import_tasks: "container.yml"
+  tags:
+    - "hass"
+    - "homeassistant"
+    - "hass:container"
+    - "homeassistant:container"

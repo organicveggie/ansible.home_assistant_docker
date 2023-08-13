@@ -1,0 +1,70 @@
+---
+- name: "Converge"
+  hosts: "all"
+  become: true
+
+  vars:
+    "pip_install_packages":
+      # Workaround for https://github.com/docker/docker-py/issues/3113
+      - name: "docker"
+        version: ">=2.4.2,<5.0.0"
+      - name: "requests"
+        version: "<2.29.0"
+      - name: "urllib3"
+        version: "<2"      
+    "postgres_docker_network_name": "postgres"
+    "hass_docker_recorder_db_user": "hass"
+    "hass_docker_recorder_db_password": "hasspassword"
+    "hass_docker_recorder_db_server_addr": "postgres"
+    "hass_docker_recorder_db_db_name": "hass"
+    "postgres_docker_initscripts":
+      - "/opt/pginit/01_db.sql"
+
+  pre_tasks:
+    - name: "Update apt cache"
+      ansible.builtin.apt:
+        cache_valid_time: 600
+        update_cache: "yes"
+      when: "ansible_os_family == 'Debian'"
+
+    - name: "Make directory for Postgres initialization scripts"
+      ansible.builtin.file:
+        path: "/opt/pginit"
+        state: "directory"
+        owner: "root"
+        group: "root"
+        mode: "0777"
+
+    - name: "Copy Postgres initialization scripts"
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "/opt/pginit/"
+        owner: "root"
+        group: "root"
+        mode: "{{ item.mode }}"
+      loop:
+        - src: "files/01_db.sql"
+          mode: "0440"
+
+  roles:
+    - role: "geerlingguy.pip"
+    - role: "geerlingguy.docker"
+    - role: "organicveggie.postgres_docker"
+      vars:
+        "postgres_docker_memory": "1GB"
+        "postgres_docker_cpu": "1"
+        "postgres_docker_network_create": "true"
+        "postgres_docker_network_subnet": "172.100.1.0/24"
+        "postgres_docker_network_gateway": "172.100.1.1"
+    - role: "organicveggie.home_assistant_docker"
+      vars:
+        "hass_docker_memory": "1GB"
+        "hass_docker_cpus": "1"
+        "hass_docker_network_create": "true"
+        "hass_docker_network_subnet": "172.100.2.0/24"
+        "hass_docker_network_gateway": "172.100.2.1"
+        "hass_docker_extra_networks":
+          - name: "{{ postgres_docker_network_name }}"
+        "hass_docker_recorder_db_url": "postgresql://{{ hass_docker_recorder_db_user }}:\
+          {{ hass_docker_recorder_db_password }}@{{ hass_docker_recorder_db_server_addr }}/\
+          {{ hass_docker_recorder_db_db_name }}"

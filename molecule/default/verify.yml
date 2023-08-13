@@ -1,0 +1,35 @@
+---
+- name: "Verify"
+  hosts: "all"
+  gather_facts: false
+  become: true
+
+  vars:
+    hass_docker_name: "hass"
+    hass_docker_volume_name_conf: "hass-config"
+
+  tasks:
+    - name: "Get info on conf volume"
+      community.docker.docker_volume_info:
+        name: "{{ hass_docker_volume_name_conf }}"
+      register: "volume_info_conf"
+
+    - name: "Verify conf volume exists"
+      ansible.builtin.assert:
+        that: "volume_info_conf.exists"
+
+    - name: "Get info on container"
+      community.docker.docker_container_info:
+        name: "{{ hass_docker_name }}"
+      register: "container_info"
+
+    - name: "Verify container exists and is running"
+      ansible.builtin.assert:
+        that:
+          - "container_info.exists"
+          - "container_info.container['State']['Running']"
+
+    - name: "Verify Traefik label"
+      ansible.builtin.assert:
+        that:
+          - "container_info.container['Config']['Labels']['traefik.enable'] == 'true'"

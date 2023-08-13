@@ -1,0 +1,91 @@
+---
+- name: "Set Docker volume list for bind mounts"
+  ansible.builtin.set_fact:
+    _hass_docker_mount_list:
+      - source: "{{ hass_docker_data_dir }}"
+        target: "/config"
+        type: "bind"
+  when: "not hass_docker_use_volumes"
+
+- name: "Set Docker mount list for volume mounts"
+  ansible.builtin.set_fact:
+    _hass_docker_mount_list:
+      - source: "{{ hass_docker_volume_config_name }}"
+        target: "/config"
+        type: "volume"
+  when: "hass_docker_use_volumes"
+
+- name: "Convert created network into array of dictionary"
+  ansible.builtin.set_fact:
+    _hass_docker_created_networks:
+      - name: "{{ hass_docker_network_name }}"
+        ipv4_address: "{{ _hass_docker_network_ipv4 | default(omit) }}"
+        ipv6_address: "{{ _hass_docker_network_ipv6 | default(omit) }}"
+        aliases: "{{ _hass_docker_network_aliases | default(omit) }}"
+  when: "hass_docker_network_create"
+
+- name: "Create placeholder array for created network"
+  ansible.builtin.set_fact:
+    _hass_docker_created_networks: []
+  when: "not hass_docker_network_create"
+
+- name: "Define all Docker networks for this container"
+  ansible.builtin.set_fact:
+    _hass_docker_all_networks: >
+      {{ _hass_docker_created_networks + hass_docker_extra_networks }}
+
+- name: "Build container FQDN"
+  ansible.builtin.set_fact:
+    _hass_docker_fqdn: "{{ hass_docker_host_name }}.{{ hass_docker_host_domain }}"
+
+- name: "Define Docker labels with Traefik disabled"
+  ansible.builtin.set_fact:
+    _hass_docker_labels: "{{ _hass_docker_labels | default({}) |
+      combine({item.key: item.value}) }}"
+  with_items:
+    - key: "traefik.enable"
+      value: "{{ hass_docker_available_externally }}"
+  when: "not hass_docker_available_externally"
+
+- name: "Define Docker labels with Traefik enabled"
+  ansible.builtin.set_fact:
+    _hass_docker_labels: "{{ _hass_docker_labels | default({}) |
+      combine({item.key: item.value}) }}"
+  with_items:
+    - key: "traefik.enable"
+      value: "{{ hass_docker_available_externally }}"
+    - key: "traefik.http.routers.hass.rule"
+      value: "Host(`{{ _hass_docker_fqdn }}`)"
+    - key: "traefik.http.routers.hass.entrypoints"
+      value: "http,https"
+    - key: "traefik.http.routers.hass.tls.certresolver"
+      value: "letsencrypt"
+    - key: "traefik.http.routers.hass.tls.domains[0].main"
+      value: "*.{{ hass_docker_host_domain }}"
+    - key: "traefik.http.services.hass.loadbalancer.server.port"
+      value: "{{ hass_docker_web_port }}"
+  when: "hass_docker_available_externally"
+
+- name: "Create Home Assistant Docker container"  # noqa: args[module]
+  community.docker.docker_container:
+    name: "{{ hass_docker_name }}"
+    image: "{{ hass_docker_image_name }}:{{ hass_docker_image_version }}"
+    pull: true
+    mounts: "{{ _hass_docker_mount_list }}"
+    env:
+      "TZ": "{{ hass_docker_home_timezone }}"
+    network_mode: "{{ hass_docker_network_name }}"
+    networks: "{{ _hass_docker_all_networks }}"
+    restart_policy: unless-stopped
+    memory: "{{ hass_docker_memory }}"
+    cpus: "{{ hass_docker_cpus }}"
+    container_default_behavior: "no_defaults"
+    auto_remove: false
+    detach: true
+    init: false
+    interactive: false
+    paused: false
+    privileged: false
+    read_only: false
+    tty: false
+    labels: "{{ _hass_docker_labels }}"

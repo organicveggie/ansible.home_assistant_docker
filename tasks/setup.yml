@@ -1,0 +1,43 @@
+---
+- name: "Create Home Assistant data directory"
+  ansible.builtin.file:
+    name: "{{ hass_docker_data_dir }}"
+    state: "directory"
+    mode: "0770"
+  when: "not hass_docker_use_volumes"
+
+- name: "Create Home Assistant Docker volume"
+  community.docker.docker_volume:
+    name: "{{ hass_docker_volume_config_name }}"
+  when: "hass_docker_use_volumes"
+
+- name: "Get info on Docker volume"
+  community.docker.docker_volume_info:
+    name: "{{ hass_docker_volume_config_name }}"
+  register: "_hass_docker_volume_conf_info"
+  when: "hass_docker_use_volumes"
+
+- name: "Build target path to conf folder on Docker volume"
+  ansible.builtin.set_fact:
+    fact_hass_docker_conf_folder:
+      "{{ _hass_docker_volume_conf_info['volume']['Mountpoint'] }}"
+  when: "hass_docker_use_volumes"
+
+- name: "Build target path to conf folder for bind mount"
+  ansible.builtin.set_fact:
+    fact_hass_docker_conf_folder: "{{ hass_docker_data_dir }}"
+  when: "not hass_docker_use_volumes"
+
+- name: "Create configuration.yaml"
+  ansible.builtin.template:
+    src: "templates/configuration.yml.j2"
+    dest: "{{ fact_hass_docker_conf_folder }}/configuration.yaml"
+    mode: "0644"
+  register: _hass_docker_file_config
+
+- name: "Create configuration.yaml"
+  ansible.builtin.template:
+    src: "templates/secrets.yml.j2"
+    dest: "{{ fact_hass_docker_conf_folder }}/secrets.yaml"
+    mode: "0600"
+  register: _hass_docker_file_secrets

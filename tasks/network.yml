@@ -1,0 +1,12 @@
+---
+- name: "Create Docker network"
+  community.docker.docker_network:
+    name: "{{ hass_docker_network_name }}"
+    driver: "{{ hass_docker_network_driver }}"
+    enable_ipv6: "{{ hass_docker_network_enable_ipv6 }}"
+    internal: "{{ hass_docker_network_internal }}"
+    scope: "{{ hass_docker_network_scope }}"
+    ipam_config:
+      - subnet: "{{ hass_docker_network_subnet }}"
+        gateway: "{{ hass_docker_network_gateway }}"
+  when: "hass_docker_network_create"
