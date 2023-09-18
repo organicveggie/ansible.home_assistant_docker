@@ -70,12 +70,12 @@ argument_specs:
 
       hass_docker_network_ipv4:
         type: "str"
-        default: "null"
+        required: false
         description: "The container’s IPv4 address in the default network. Defaults to using DHCP."
 
       hass_docker_network_ipv6:
         type: "str"
-        default: "null"
+        required: false
         description:
           The container’s IPv6 address in the default network. Defaults to using DHCP. Only applies
           if IPv6 is enabled in the default network.
@@ -118,7 +118,7 @@ argument_specs:
 
       hass_docker_recorder_db_url:
         type: "str"
-        default: "null"
+        required: false
         description:
           Customize the URL to the database engine used by the recorder integration.
 
