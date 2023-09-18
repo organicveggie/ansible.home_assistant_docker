@@ -66,6 +66,12 @@
       value: "{{ hass_docker_web_port }}"
   when: "hass_docker_available_externally"
 
+- name: "Define user-supplied extra Docker labels"
+  ansible.builtin.set_fact:
+    _hass_docker_labels: "{{ _hass_docker_labels | default({}) |
+      combine({item.key: item.value}) }}"
+  loop: "{{ hass_docker_extra_labels | dict2items }}"
+
 - name: "Create Home Assistant Docker container"  # noqa: args[module]
   community.docker.docker_container:
     name: "{{ hass_docker_name }}"

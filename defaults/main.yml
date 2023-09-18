@@ -22,13 +22,6 @@ hass_docker_home_units: "imperial"
 hass_docker_url: "https://{{ hass_docker_host_name }}.{{ hass_docker_host_domain }}"
 
 #####
-# Home Assistant integrations
-#####
-
-# Port number to use when listening for Ecowitt connections.
-hass_docker_ecowitt_port: null
-
-#####
 # Container settings
 #####
 
@@ -49,6 +42,9 @@ hass_docker_memory: "2GB"
 
 # TCP port number to expose to handle HTTP traffic.
 hass_docker_web_port: "8123"
+
+# Dictionary of extra key value pairs to set as labels on the Docker container.
+hass_docker_extra_labels: {}
 
 #####
 # Docker volumes and folders.

@@ -1,0 +1,26 @@
+---
+- name: "Verify"
+  hosts: "all"
+  gather_facts: false
+  become: true
+
+  vars:
+    hass_docker_name: "hass"
+
+  tasks:
+    - name: "Get info on container"
+      community.docker.docker_container_info:
+        name: "{{ hass_docker_name }}"
+      register: "container_info"
+
+    - name: "Verify container exists and is running"
+      ansible.builtin.assert:
+        that:
+          - "container_info.exists"
+          - "container_info.container['State']['Running']"
+
+    - name: "Verify extra labels"
+      ansible.builtin.assert:
+        that:
+          - "container_info.container['Config']['Labels']['test_key_1'] == 'test_value_1'"
+          - "container_info.container['Config']['Labels']['test_key_2'] == 'test_value_2'"

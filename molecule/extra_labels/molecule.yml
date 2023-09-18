@@ -1,0 +1,27 @@
+---
+dependency:
+  name: "galaxy"
+  options:
+    requirements-file: "requirements.yml"
+    role-file: "requirements.yml"
+
+driver:
+  name: "vagrant"
+  provider:
+    name: "virtualbox"
+
+platforms:
+  - name: "vagrant-instance"
+    box: "generic/${MOLECULE_DISTRO:-ubuntu2204}"
+    memory: 2048
+    cpus: 2
+
+provisioner:
+  name: "ansible"
+  log: true
+  env:
+    ANSIBLE_COLLECTIONS_PATH: "../../collections"
+    ANSIBLE_ROLES_PATH: "../../roles"
+
+verifier:
+  name: "ansible"
