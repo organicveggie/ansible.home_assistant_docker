@@ -1,0 +1,6 @@
+---
+- name: "Restart Home Assistant Docker"
+  community.docker.docker_container:
+    name: "{{ hass_docker_name }}"
+    restart: true
+    state: "started"
