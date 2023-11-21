@@ -3,23 +3,35 @@
 # Home Assistant settings
 #####
 
-# Latitude of the location where Home Assistant is running.
+# Controls whether or not this role creates the configuration.yml and secrets.yml files.
+hass_docker_create_config: false
+
+# Latitude of the location where Home Assistant is running. Only used if hass_docker_create_config
+# is true.
 hass_docker_home_latitude: "38.8977"
 
-# Longitude of the location where Home Assistant is running.
+# Longitude of the location where Home Assistant is running. Only used if hass_docker_create_config
+# is true.
 hass_docker_home_longitude: "77.0365"
 
-# Name of the location where Home Assistant is running.
+# Name of the location where Home Assistant is running. Only used if hass_docker_create_config
+# is true.
 hass_docker_home_name: "home"
 
-# Timeone of the location where Home Assistant is running.
+# Timeone of the location where Home Assistant is running. Only used if hass_docker_create_config
+# true.
 hass_docker_home_timezone: "America/New_York"
 
-# Default system of units in the location where Home Assistant is running.
+# Default system of units in the location where Home Assistant is running. Only used if
+# hass_docker_create_config is true.
 hass_docker_home_units: "imperial"
 
-# URL of the Home Assistant instance.
+# URL of the Home Assistant instance. Only used if hass_docker_create_config is true.
 hass_docker_url: "https://{{ hass_docker_host_name }}.{{ hass_docker_host_domain }}"
+
+# Customize the database engine used by the recorder integration. Only used if
+# hass_docker_create_config is true.
+hass_docker_recorder_db_url: null
 
 #####
 # Container settings
@@ -112,13 +124,6 @@ hass_docker_network_subnet: "172.101.1.0/24"
 
 # IPv4 gateway for the default network. Only used when [hass_docker_network_create] is enabled.
 hass_docker_network_gateway: "172.101.1.1"
-
-#####
-# Database settings
-#####
-
-# Customize the database engine used by the recorder integration.
-hass_docker_recorder_db_url: null
 
 #####
 # Traefik

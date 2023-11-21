@@ -34,10 +34,12 @@
     dest: "{{ fact_hass_docker_conf_folder }}/configuration.yaml"
     mode: "0644"
   register: _hass_docker_file_config
+  when: "hass_docker_create_config"
 
-- name: "Create configuration.yaml"
+- name: "Create secrets.yaml"
   ansible.builtin.template:
     src: "templates/secrets.yml.j2"
     dest: "{{ fact_hass_docker_conf_folder }}/secrets.yaml"
     mode: "0600"
   register: _hass_docker_file_secrets
+  when: "hass_docker_create_config"
