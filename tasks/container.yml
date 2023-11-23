@@ -72,7 +72,17 @@
       combine({item.key: item.value}) }}"
   loop: "{{ hass_docker_extra_labels | dict2items }}"
 
-- name: "Create Home Assistant Docker container"  # noqa: args[module]
+- name: "Define Docker zwave device mount"
+  ansible.builtin.set_fact:
+    _hass_docker_zwave_device: "{{ hass_docker_zwave_device }}:/dev/zwave"
+  when: "hass_docker_zwave_device"
+
+- name: "Define empty Docker zwave device mount"
+  ansible.builtin.set_fact:
+    _hass_docker_zwave_device: null
+  when: "not hass_docker_zwave_device"
+
+- name: "Create Home Assistant Docker container" # noqa: args[module]
   community.docker.docker_container:
     name: "{{ hass_docker_name }}"
     image: "{{ hass_docker_image_name }}:{{ hass_docker_image_version }}"
@@ -85,6 +95,7 @@
     restart_policy: unless-stopped
     memory: "{{ hass_docker_memory }}"
     cpus: "{{ hass_docker_cpus }}"
+    devices: "{{ _hass_docker_zwave_device|default(omit) if _hass_docker_zwave_device is not defined else [_hass_docker_zwave_device] }}"
     container_default_behavior: "no_defaults"
     auto_remove: false
     detach: true

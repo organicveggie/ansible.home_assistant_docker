@@ -33,6 +33,10 @@ hass_docker_url: "https://{{ hass_docker_host_name }}.{{ hass_docker_host_domain
 # hass_docker_create_config is true.
 hass_docker_recorder_db_url: null
 
+# Optional device filename for a zwave device. If defined, will be mounted in the container
+# at /dev/zwave.
+hass_docker_zwave_device: null
+
 #####
 # Container settings
 #####
