@@ -75,7 +75,12 @@
 - name: "Define Docker zwave device mount"
   ansible.builtin.set_fact:
     _hass_docker_zwave_device: "{{ hass_docker_zwave_device }}:/dev/zwave"
-  when: "hass_docker_zwave_device"
+  when: "hass_docker_zwave_device | default('', true)"
+
+- name: "Show zwave device mount"
+  ansible.builtin.debug:
+    msg: "Will attach zwave device to container: {{ _hass_docker_zwave_device }}"
+  when: "_hass_docker_zwave_device | default('', true)"
 
 - name: "Create Home Assistant Docker container" # noqa: args[module]
   community.docker.docker_container:
